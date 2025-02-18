@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const DetailsPage = () => {
+const ChipsDetailsPage = () => {
   const location = useLocation();
   const size = location.pathname.split('/').pop(); // Extracts the size from the URL
 
@@ -14,10 +14,15 @@ const DetailsPage = () => {
 
   return (
     <div className="details-page">
-      <h3>Transaction Details for {size.replace('Inch', ' Inch Stones')}</h3>
+      <h3>Transaction Details for {size.replace(/oneFourth|oneHalf|threeFourth|oneAndHalf/, (match) => ({
+        oneFourth: '1/4',
+        oneHalf: '1/2',
+        threeFourth: '3/4',
+        oneAndHalf: '1 1/2'
+      })[match])} Chips</h3>
 
       {transactions.length > 0 ? (
-        <table className="transaction-table">
+        <table>
           <thead>
             <tr>
               <th>Action</th>
@@ -30,17 +35,13 @@ const DetailsPage = () => {
           </thead>
           <tbody>
             {transactions.map((t, index) => (
-              <tr key={index} className={t.paymentStatus === 'yes' ? 'paid' : 'unpaid'}>
+              <tr key={index}>
                 <td>{t.action}</td>
                 <td>{t.date}</td>
                 <td>{t.quantity}</td>
                 <td>{t.price}</td>
                 {t.action === 'remove' && <td>{t.name}</td>}
-                {t.action === 'remove' && (
-                  <td style={{ color: t.paymentStatus === 'yes' ? 'green' : 'red' }}>
-                    {t.paymentStatus}
-                  </td>
-                )}
+                {t.action === 'remove' && <td>{t.paymentStatus}</td>}
               </tr>
             ))}
           </tbody>
@@ -52,4 +53,4 @@ const DetailsPage = () => {
   );
 };
 
-export default DetailsPage;
+export default ChipsDetailsPage;

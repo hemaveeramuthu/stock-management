@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const DetailsPage = () => {
+const MsandDetailsPage = () => {
   const location = useLocation();
   const size = location.pathname.split('/').pop(); // Extracts the size from the URL
 
@@ -17,7 +17,7 @@ const DetailsPage = () => {
       <h3>Transaction Details for {size.replace('Inch', ' Inch Stones')}</h3>
 
       {transactions.length > 0 ? (
-        <table className="transaction-table">
+        <table>
           <thead>
             <tr>
               <th>Action</th>
@@ -30,17 +30,13 @@ const DetailsPage = () => {
           </thead>
           <tbody>
             {transactions.map((t, index) => (
-              <tr key={index} className={t.paymentStatus === 'yes' ? 'paid' : 'unpaid'}>
+              <tr key={index}>
                 <td>{t.action}</td>
                 <td>{t.date}</td>
                 <td>{t.quantity}</td>
                 <td>{t.price}</td>
                 {t.action === 'remove' && <td>{t.name}</td>}
-                {t.action === 'remove' && (
-                  <td style={{ color: t.paymentStatus === 'yes' ? 'green' : 'red' }}>
-                    {t.paymentStatus}
-                  </td>
-                )}
+                {t.action === 'remove' && <td>{t.paymentStatus}</td>}
               </tr>
             ))}
           </tbody>
@@ -52,4 +48,4 @@ const DetailsPage = () => {
   );
 };
 
-export default DetailsPage;
+export default MsandDetailsPage;

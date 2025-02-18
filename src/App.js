@@ -9,6 +9,10 @@ import MsandPage from './pages/MsandPage';
 import PsandPage from './pages/PsandPage';
 import ChipsPage from './pages/ChipsPage';
 import DetailsPage from './pages/DetailsPage';
+import MsandDetailsPage from './pages/MsandDetailsPage';
+import PsandDetailsPage from './pages/PsandDetailsPage';
+import ChipsDetailsPage from './pages/ChipsDetailsPage';
+import CementDetailsPage from './pages/CementDetailsPage';
 import './App.css';
 
 function App() {
@@ -23,6 +27,10 @@ function App() {
         <Route path="/" element={<HomePage />} />
           <Route path="/hollow-bricks" element={<HollowBricksPage />} />
           <Route path="/details/:size" element={<DetailsPage />} />
+          <Route path="/msand-details" element={<MsandDetailsPage />} />
+          <Route path="/psand-details" element={<PsandDetailsPage />} />
+          <Route path="/chips-details" element={<ChipsDetailsPage />} />
+          <Route path="/cement-details" element={<CementDetailsPage />} />
 
           <Route path="/cement" element={<CementPage />} />
           <Route path="/msand" element={<MsandPage />} />

@@ -15,7 +15,7 @@ const PsandPage = () => {
     quantity: '',
     price: '',
     name: '',
-    paymentStatus: '',
+    paymentStatus: '',  // Add this to handle radio buttons
   });
 
   const [modalState, setModalState] = useState(null);
@@ -38,20 +38,45 @@ const PsandPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const quantity = parseInt(formData.quantity);
-
+  
     if (!quantity || quantity <= 0) return;
-
-    setStock((prevStock) => {
-      if (modalState === 'add') {
-        return prevStock + quantity;
-      } else if (modalState === 'remove' && prevStock >= quantity) {
-        return prevStock - quantity;
-      }
-      return prevStock;
-    });
-
+  
+    // Handle stock update first
+    let newStock = stock;
+  
+    if (modalState === 'add') {
+      newStock = stock + quantity;
+    } else if (modalState === 'remove' && stock >= quantity) {
+      newStock = stock - quantity;
+    } else {
+      return; // Don't proceed if the condition isn't met
+    }
+  
+    // Save the new stock to localStorage after updating it
+    setStock(newStock);
+  
+    // Log the transaction
+    const newTransaction = {
+      action: modalState,
+      date: formData.date,
+      quantity: formData.quantity,
+      price: formData.price,
+      name: formData.name,
+      paymentStatus: formData.paymentStatus, // Save the selected payment status
+    };
+  
+    // Retrieve existing transactions and add the new one
+    const storedTransactions = JSON.parse(localStorage.getItem('psandTransactions')) || [];
+    storedTransactions.push(newTransaction);
+  
+    // Save the updated transactions back to localStorage
+    localStorage.setItem('psandTransactions', JSON.stringify(storedTransactions));
+  
+    // Reset form and close modal
     setModalState(null);
+    setFormData({ date: '', quantity: '', price: '', name: '', paymentStatus: '' });
   };
+  
 
   const handleDetailsClick = () => {
     navigate('/details/psand', { state: stock });
@@ -107,7 +132,28 @@ const PsandPage = () => {
               {modalState === 'remove' && (
                 <>
                   <label>Payment Status</label>
-                  <input type="text" name="paymentStatus" value={formData.paymentStatus} onChange={handleChange} required />
+                  <div>
+                    <label>
+                      <input
+                        type="radio"
+                        name="paymentStatus"
+                        value="Paid"
+                        checked={formData.paymentStatus === 'Paid'}
+                        onChange={handleChange}
+                      />
+                      Paid
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="paymentStatus"
+                        value="Unpaid"
+                        checked={formData.paymentStatus === 'Unpaid'}
+                        onChange={handleChange}
+                      />
+                      Unpaid
+                    </label>
+                  </div>
                 </>
               )}
               

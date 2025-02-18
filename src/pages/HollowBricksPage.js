@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const HollowBricksPage = () => {
   const navigate = useNavigate();
 
-  // Load stock from localStorage on mount
+  // Load stock from localStorage
   const getStoredStock = (key) => Number(localStorage.getItem(key)) || 0;
 
   const [stock, setStock] = useState({
@@ -19,12 +19,12 @@ const HollowBricksPage = () => {
     quantity: '',
     price: '',
     name: '',
-    paymentStatus: '',
+    paymentStatus: 'unpaid' // Default payment status as 'unpaid'
   });
 
   const [modalState, setModalState] = useState({ action: null, size: null });
 
-  // Save stock changes to localStorage
+  // Save stock to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('fourInchStock', stock.fourInch);
     localStorage.setItem('sixInchStock', stock.sixInch);
@@ -32,24 +32,24 @@ const HollowBricksPage = () => {
   }, [stock]);
 
   const handleStockUpdate = (size, action) => {
-    if (action === 'add') {
-      setModalState({ action: 'add', size });
-    } else {
-      setModalState({ action: 'remove', size });
-    }
-    setFormData({ date: '', quantity: '', price: '', name: '', paymentStatus: '' });
+    setModalState({ action, size });
+    setFormData({ date: '', quantity: '', price: '', name: '', paymentStatus: 'unpaid' });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRadioChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, paymentStatus: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const { size, action } = modalState;
     const quantity = parseInt(formData.quantity);
-
     if (!quantity || quantity <= 0) return;
 
     setStock((prevStock) => {
@@ -61,21 +61,24 @@ const HollowBricksPage = () => {
       }
       return updatedStock;
     });
+
+    // Store transaction details in localStorage
+    const transactions = JSON.parse(localStorage.getItem(`${size}Transactions`)) || [];
+    transactions.push({ ...formData, action, size });
+    localStorage.setItem(`${size}Transactions`, JSON.stringify(transactions));
+
     setModalState({ action: null, size: null });
   };
 
   const handleDetailsClick = (size) => {
-    navigate(`/details/${size}`, {
-      state: stock
-    });
+    navigate(`/details/${size}`);
   };
 
   return (
     <div className="page-content">
       <h3>Hollow Bricks Stock</h3>
-
-      {["fourInch", "sixInch", "eightInch"].map((size, index) => (
-        <table key={index}>
+      {['fourInch', 'sixInch', 'eightInch'].map((size) => (
+        <table key={size}>
           <thead>
             <tr>
               <th>{size.replace('Inch', ' Inch Stones')}</th>
@@ -103,7 +106,6 @@ const HollowBricksPage = () => {
           <div className="modal-content">
             <span className="close-btn" onClick={() => setModalState({ action: null, size: null })}>&times;</span>
             <h4>{modalState.action === 'add' ? 'Add' : 'Remove'} Stock for {modalState.size.replace('Inch', ' Inch Stones')}</h4>
-
             <form onSubmit={handleSubmit}>
               {modalState.action === 'remove' && (
                 <>
@@ -113,20 +115,36 @@ const HollowBricksPage = () => {
               )}
               <label>Date</label>
               <input type="date" name="date" value={formData.date} onChange={handleChange} required />
-              
               <label>Quantity</label>
               <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} required />
-              
               <label>Price</label>
               <input type="number" name="price" value={formData.price} onChange={handleChange} required />
-              
-              {modalState.action === 'remove' && (
-                <>
-                  <label>Payment Status</label>
-                  <input type="text" name="paymentStatus" value={formData.paymentStatus} onChange={handleChange} required />
-                </>
-              )}
-              
+
+              {/* Payment Status Radio Buttons */}
+              <label>Payment Status</label>
+              <div>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="paymentStatus" 
+                    value="paid" 
+                    checked={formData.paymentStatus === 'paid'} 
+                    onChange={handleRadioChange} 
+                  />
+                  Paid
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="paymentStatus" 
+                    value="unpaid" 
+                    checked={formData.paymentStatus === 'unpaid'} 
+                    onChange={handleRadioChange} 
+                  />
+                  Unpaid
+                </label>
+              </div>
+
               <button type="submit">{modalState.action === 'add' ? 'Add Stock' : 'Remove Stock'}</button>
             </form>
           </div>

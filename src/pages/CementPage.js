@@ -3,36 +3,41 @@ import { useNavigate } from 'react-router-dom';
 
 const CementPage = () => {
   const navigate = useNavigate();
-  const cementBrands = ['Bharathi', 'Ramco', 'Dalmia', 'Priya', 'Jsw', 'Zurai', 'Ultratech'];
 
+  // Load stock from localStorage on mount
   const getStoredStock = (key) => Number(localStorage.getItem(key)) || 0;
 
-  const [stock, setStock] = useState(
-    cementBrands.reduce((acc, brand) => {
-      acc[brand] = getStoredStock(`${brand}Stock`);
-      return acc;
-    }, {})
-  );
+  const [stock, setStock] = useState({
+    Bharathi: getStoredStock('BharathiStock'),
+    Ramco: getStoredStock('RamcoStock'),
+    Dalmia: getStoredStock('DalmiaStock'),
+    Priya: getStoredStock('PriyaStock'),
+    Jsw: getStoredStock('JswStock'),
+    Zurai: getStoredStock('ZuraiStock'),
+    Ultratech: getStoredStock('UltratechStock'),
+  });
 
+  // State for form data
   const [formData, setFormData] = useState({
     date: '',
     quantity: '',
     price: '',
     name: '',
-    paymentStatus: '',
+    paymentStatus: 'unpaid', // Default payment status as 'unpaid'
   });
 
   const [modalState, setModalState] = useState({ action: null, brand: null });
 
+  // Save stock changes to localStorage
   useEffect(() => {
-    cementBrands.forEach((brand) => {
-      localStorage.setItem(`${brand}Stock`, stock[brand]);
+    Object.keys(stock).forEach(key => {
+      localStorage.setItem(`${key}Stock`, stock[key]);
     });
   }, [stock]);
 
   const handleStockUpdate = (brand, action) => {
     setModalState({ action, brand });
-    setFormData({ date: '', quantity: '', price: '', name: '', paymentStatus: '' });
+    setFormData({ date: '', quantity: '', price: '', name: '', paymentStatus: 'unpaid' });
   };
 
   const handleChange = (e) => {
@@ -40,12 +45,19 @@ const CementPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleRadioChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, paymentStatus: value });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { brand, action } = modalState;
+    const { action, brand } = modalState;
     const quantity = parseInt(formData.quantity);
+
     if (!quantity || quantity <= 0) return;
 
+    // Update stock based on the action
     setStock((prevStock) => {
       const updatedStock = { ...prevStock };
       if (action === 'add') {
@@ -55,44 +67,69 @@ const CementPage = () => {
       }
       return updatedStock;
     });
+
+    // Add the transaction to the localStorage
+    const transaction = {
+      date: formData.date,
+      action,
+      quantity,
+      price: formData.price,
+      name: formData.name || '',
+      paymentStatus: formData.paymentStatus || '',
+    };
+
+    const transactions = JSON.parse(localStorage.getItem(`${brand}Transactions`)) || [];
+    transactions.push(transaction);
+    localStorage.setItem(`${brand}Transactions`, JSON.stringify(transactions));
+
     setModalState({ action: null, brand: null });
   };
 
   const handleDetailsClick = (brand) => {
-    navigate(`/details/${brand}`, { state: stock });
+    navigate(`/details/${brand}`);
   };
 
   return (
     <div className="page-content">
       <h3>Cement Stock</h3>
-      {cementBrands.map((brand, index) => (
-        <table key={index}>
+
+      {[{ key: 'Bharathi', label: 'Bharathi' },
+        { key: 'Ramco', label: 'Ramco' },
+        { key: 'Dalmia', label: 'Dalmia' },
+        { key: 'Priya', label: 'Priya' },
+        { key: 'Jsw', label: 'JSW' },
+        { key: 'Zurai', label: 'Zurai' },
+        { key: 'Ultratech', label: 'Ultratech' },
+      ].map(({ key, label }) => (
+        <table key={key}>
           <thead>
             <tr>
-              <th>{brand}</th>
+              <th>{label} Cement</th>
               <th>Stock</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>{brand}</td>
-              <td>{stock[brand]}</td>
+              <td>{label} Cement</td>
+              <td>{stock[key]}</td>
               <td>
-                <button onClick={() => handleStockUpdate(brand, 'add')}>Add</button>
-                <button onClick={() => handleStockUpdate(brand, 'remove')}>Remove</button>
-                <button onClick={() => handleDetailsClick(brand)}>Details</button>
+                <button onClick={() => handleStockUpdate(key, 'add')}>Add</button>
+                <button onClick={() => handleStockUpdate(key, 'remove')}>Remove</button>
+                <button onClick={() => handleDetailsClick(key)}>Details</button>
               </td>
             </tr>
           </tbody>
         </table>
       ))}
 
+      {/* Modal */}
       {modalState.action && (
         <div className="modal-overlay">
           <div className="modal-content">
             <span className="close-btn" onClick={() => setModalState({ action: null, brand: null })}>&times;</span>
-            <h4>{modalState.action === 'add' ? 'Add' : 'Remove'} Stock for {modalState.brand}</h4>
+            <h4>{modalState.action === 'add' ? 'Add' : 'Remove'} Stock for {modalState.brand} Cement</h4>
+
             <form onSubmit={handleSubmit}>
               {modalState.action === 'remove' && (
                 <>
@@ -102,20 +139,38 @@ const CementPage = () => {
               )}
               <label>Date</label>
               <input type="date" name="date" value={formData.date} onChange={handleChange} required />
-              
+
               <label>Quantity</label>
               <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} required />
-              
+
               <label>Price</label>
               <input type="number" name="price" value={formData.price} onChange={handleChange} required />
-              
-              {modalState.action === 'remove' && (
-                <>
-                  <label>Payment Status</label>
-                  <input type="text" name="paymentStatus" value={formData.paymentStatus} onChange={handleChange} required />
-                </>
-              )}
-              
+
+              {/* Payment Status Radio Buttons */}
+              <label>Payment Status</label>
+              <div>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="paymentStatus" 
+                    value="paid" 
+                    checked={formData.paymentStatus === 'paid'} 
+                    onChange={handleRadioChange} 
+                  />
+                  Paid
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="paymentStatus" 
+                    value="unpaid" 
+                    checked={formData.paymentStatus === 'unpaid'} 
+                    onChange={handleRadioChange} 
+                  />
+                  Unpaid
+                </label>
+              </div>
+
               <button type="submit">{modalState.action === 'add' ? 'Add Stock' : 'Remove Stock'}</button>
             </form>
           </div>
