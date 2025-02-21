@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './home_page.css'; // Import the CSS file
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -32,6 +33,14 @@ const HomePage = () => {
     threeFourth: getStoredStock('threeFourthStock'),
     oneAndHalf: getStoredStock('oneAndHalfStock')
   });
+
+  // Product categories with their respective colors
+  const categoryColors = {
+    'Hollow Bricks': '#f8d7da',  // Light Red
+    'Cement': '#d1ecf1',         // Light Blue
+    'Sand': '#e2e3e5',           // Light Gray
+    'Chips (Jalli)': '#d4edda'   // Light Green
+  };
 
   // Product categories
   const productCategories = [
@@ -76,7 +85,7 @@ const HomePage = () => {
         <tbody>
           {productCategories.map(({ category, products }) =>
             products.map(({ key, label }, index) => (
-              <tr key={key}>
+              <tr key={key} style={{ backgroundColor: categoryColors[category] }}>
                 {index === 0 && <td rowSpan={products.length}>{category}</td>}
                 <td>{label}</td>
                 <td>{stock[key]}</td>

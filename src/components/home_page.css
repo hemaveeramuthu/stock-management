@@ -1,0 +1,141 @@
+/* home_page.css */
+
+.page-content {
+    margin: 20px;
+    padding: 20px;
+    background-color: hsla(206, 30%, 95%, 0.241);
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 28px;
+    margin-bottom: 30px;
+    font-family: 'Arial', sans-serif;
+    text-transform: uppercase;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: 'Verdana', sans-serif;
+    text-align: left;
+}
+
+table th, table td {
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    color: #34495e;
+}
+
+table th {
+    background-color: #3498db;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+table td {
+    background-color: #ffffff;
+    border: 1px solid #ecf0f1;
+}
+
+table tr:nth-child(even) td {
+    background-color: #ecf0f1;
+}
+
+table tr:hover {
+    background-color: #f5f7fa;
+}
+
+td[rowspan] {
+    font-weight: bold;
+    background-color: #eaf1f8;
+}
+
+table td:first-child {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Different colors for each product */
+
+/* Hollow Bricks */
+.fourInch {
+    background-color: #f39c12; /* Orange for 4 Inch Bricks */
+}
+
+.sixInch {
+    background-color: #f1c40f; /* Lighter Orange for 6 Inch Bricks */
+}
+
+.eightInch {
+    background-color: #e67e22; /* Darker Orange for 8 Inch Bricks */
+}
+
+/* Cement */
+.bharathi {
+    background-color: #e74c3c; /* Red for Bharathi Cement */
+}
+
+.ramco {
+    background-color: #c0392b; /* Darker Red for Ramco Cement */
+}
+
+.dalmia {
+    background-color: #f44336; /* Lighter Red for Dalmia Cement */
+}
+
+.priya {
+    background-color: #d32f2f; /* Dark Red for Priya Cement */
+}
+
+.jsw {
+    background-color: #e57373; /* Soft Red for JSW Cement */
+}
+
+.zurai {
+    background-color: #c2185b; /* Magenta for Zurai Cement */
+}
+
+.ultratech {
+    background-color: #9b59b6; /* Purple for Ultratech Cement */
+}
+
+/* Sand */
+.msand {
+    background-color: #27ae60; /* Green for Msand */
+}
+
+.psand {
+    background-color: #2ecc71; /* Lighter Green for Psand */
+}
+
+/* Chips (Jalli) */
+.oneFourth {
+    background-color: #9b59b6; /* Purple for 1/4 Inch Jalli */
+}
+
+.oneHalf {
+    background-color: #8e44ad; /* Darker Purple for 1/2 Inch Jalli */
+}
+
+.threeFourth {
+    background-color: #76448a; /* Deep Purple for 3/4 Inch Jalli */
+}
+
+.oneAndHalf {
+    background-color: #5e3370; /* Even Darker Purple for 1 1/2 Inch Jalli */
+}
+
+/* Hover effect for better visual interaction */
+.fourInch:hover, .sixInch:hover, .eightInch:hover,
+.bharathi:hover, .ramco:hover, .dalmia:hover, .priya:hover, .jsw:hover, .zurai:hover, .ultratech:hover,
+.msand:hover, .psand:hover,
+.oneFourth:hover, .oneHalf:hover, .threeFourth:hover, .oneAndHalf:hover {
+    opacity: 0.8;
+}

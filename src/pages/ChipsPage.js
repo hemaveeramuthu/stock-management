@@ -7,11 +7,22 @@ const ChipsPage = () => {
   // Load stock from localStorage on mount
   const getStoredStock = (key) => Number(localStorage.getItem(key)) || 0;
 
+  // Load payment status from localStorage
+  const getStoredPaymentStatus = (key) => localStorage.getItem(key) || 'Pending';
+
   const [stock, setStock] = useState({
     oneFourth: getStoredStock('oneFourthStock'),
     oneHalf: getStoredStock('oneHalfStock'),
     threeFourth: getStoredStock('threeFourthStock'),
     oneAndHalf: getStoredStock('oneAndHalfStock')
+  });
+
+  // Load payment status for each size
+  const [paymentStatus, setPaymentStatus] = useState({
+    oneFourth: getStoredPaymentStatus('oneFourthPaymentStatus'),
+    oneHalf: getStoredPaymentStatus('oneHalfPaymentStatus'),
+    threeFourth: getStoredPaymentStatus('threeFourthPaymentStatus'),
+    oneAndHalf: getStoredPaymentStatus('oneAndHalfPaymentStatus')
   });
 
   // State for form data
@@ -25,12 +36,13 @@ const ChipsPage = () => {
 
   const [modalState, setModalState] = useState({ action: null, size: null });
 
-  // Save stock changes to localStorage
+  // Save stock and payment status changes to localStorage
   useEffect(() => {
     Object.keys(stock).forEach(key => {
       localStorage.setItem(`${key}Stock`, stock[key]);
+      localStorage.setItem(`${key}PaymentStatus`, paymentStatus[key]);
     });
-  }, [stock]);
+  }, [stock, paymentStatus]);
 
   const handleStockUpdate = (size, action) => {
     setModalState({ action, size });
@@ -40,11 +52,6 @@ const ChipsPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleActionChange = (e) => {
-    const { value } = e.target;
-    setModalState({ ...modalState, action: value });
   };
 
   const handlePaymentStatusChange = (e) => {
@@ -59,7 +66,7 @@ const ChipsPage = () => {
 
     if (!quantity || quantity <= 0) return;
 
-    // Update stock based on the action
+    // Update stock and payment status based on the action
     setStock((prevStock) => {
       const updatedStock = { ...prevStock };
       if (action === 'add') {
@@ -69,6 +76,12 @@ const ChipsPage = () => {
       }
       return updatedStock;
     });
+
+    // Update payment status
+    setPaymentStatus((prevStatus) => ({
+      ...prevStatus,
+      [size]: formData.paymentStatus
+    }));
 
     // Add the transaction to the localStorage
     const transaction = {
@@ -91,6 +104,10 @@ const ChipsPage = () => {
     navigate(`/details/${size}`);
   };
 
+  const getPaymentStatusColor = (status) => {
+    return status === 'Paid' ? 'green' : 'red';
+  };
+
   return (
     <div className="page-content">
       <h3>Chips (Jalli) Stock</h3>
@@ -106,7 +123,7 @@ const ChipsPage = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr style={{ backgroundColor: getPaymentStatusColor(paymentStatus[key]) }}>
                 <td>{label} Chips</td>
                 <td>{stock[key]}</td>
                 <td>
